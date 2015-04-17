@@ -1,21 +1,3 @@
-/**
-    TimbrumWEB aka Contempla aka Controllo Tempo Lavorato
-    Copyright (C) 2020  Marco Verrocchio
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>
-**/
-
 package it.cineca.utils.timbrum.servlet;
 
 import it.cineca.utils.timbrum.Timbrum;
@@ -156,7 +138,7 @@ public class TimbrumServlet extends HttpServlet{
 					}
 					
 					if (exitTime.getYears() == 0 && exitTime.getMonths() == 0 && 
-							exitTime.getWeeks() == 0 && exitTime.getDays() == 0 && 
+							exitTime.getWeeks() == 0 && exitTime.getDays() == 0 && exitTime.getHours() == 0 && 
 							exitTime.getMinutes() < 30){
 						remainingTime = remainingTime.plus(Period.minutes(30));
 					}
@@ -173,7 +155,15 @@ public class TimbrumServlet extends HttpServlet{
 				outTimeDate = nowDate.plus(remainingTime);
 				if (date.getYear() == nowDate.getYear() && date.getDayOfYear() == nowDate.getDayOfYear()){
 					//req.setAttribute("tempoMancante",periodFormatter.print(remainingTime.toPeriod().normalizedStandard()));
-					req.setAttribute("oraUscita",hhmmDTF.print(outTimeDate));					
+					req.setAttribute("oraUscita",hhmmDTF.print(outTimeDate));
+					if (workedTime.getHours() > totalDayWorkTime.getHours() || 
+						(workedTime.getHours() == totalDayWorkTime.getHours() && workedTime.getMinutes() >= totalDayWorkTime.getMinutes())){
+						
+						req.setAttribute("dayFinished", "true");
+					}
+					else{
+						req.setAttribute("dayFinished", "false");
+					}
 				}
 
 				req.setAttribute("timbrature", timbratureString);

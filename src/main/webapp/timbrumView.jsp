@@ -18,6 +18,7 @@
 	String tempoLavorato = (String)request.getAttribute("tempoLavorato");
 	String tempoMancante = (String)request.getAttribute("tempoMancante");
 	String oraUscita = (String)request.getAttribute("oraUscita");
+	String dayFinished = (String)request.getAttribute("dayFinished");
 	Date nowDate = new Date();
 	String date = (String)request.getAttribute("date");
 	if (date == null){
@@ -73,7 +74,7 @@
 			<input type="submit" value="Aggiorna" />
 		</form>			
 		<%
-		if (!timbrature.isEmpty()){
+		if (timbrature != null && !timbrature.isEmpty()){
 		%>		
 				<table border="1">
 					<% 
@@ -87,9 +88,18 @@
 				<p>Hai lavorato per <%= tempoLavorato %></p>
 				<%
 				if (oraUscita != null){
-				%>
-					<p>Puoi uscire alle <%= oraUscita %> per completare le 7h 12m di lavoro</p>
-				<%	
+					if (dayFinished.equals("true")){
+						%>
+						<p>Complimenti !!! Anche oggi hai portato la pagnotta a casa. Ma ora la domanda sorge
+						   spontanea ... che ci fai ancora su quella sedia???</p>
+						<%	
+					}
+					else{
+						%>
+						<p>Puoi uscire alle <%= oraUscita %> per completare le 7h 12m di lavoro</p>
+						<%						
+					}
+	
 				}
 				if (tempoMancante != null){
 				%>
