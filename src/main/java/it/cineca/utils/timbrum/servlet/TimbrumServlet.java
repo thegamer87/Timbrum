@@ -120,7 +120,7 @@ public class TimbrumServlet extends HttpServlet{
 					
 				}
 				
-				timeBean = TimbrumManager.computeWorkingDay( timbrature , new Date() );
+				timeBean = TimbrumManager.computeWorkingDay( timbrature , new Date(), date.toDate() );
 				req.setAttribute("timeBean", timeBean);
 				req.getSession().setAttribute("timeBean", timeBean);
 				

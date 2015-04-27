@@ -10,14 +10,12 @@ import java.util.Date;
 public class RecordTimbratura {
 	private String time;
 	private String dir;
-	private Date date;
 	private boolean enabled = true;
-	public RecordTimbratura(String[] strings,String[] headers, Date pDate) {
+	public RecordTimbratura(String[] strings,String[] headers) {
 		int timeIndex =getIndexFor(headers,"TIMETIMBR");
 		int dirIndex =getIndexFor(headers,"DIRTIMBR");
 		time= strings[timeIndex];
 		dir= strings[dirIndex];
-		date = pDate;
 	}
 	
 	//DAYSTAMP, TIMETIMBR, DIRTIMBR, CAUSETIMBR, TYPETIMBR, IPTIMBR
@@ -35,10 +33,6 @@ public class RecordTimbratura {
 			}
 		}
 		return -1;
-	}
-	
-	public Date getDate(){
-		return date;
 	}
 	
 	public String getTime() {
@@ -95,7 +89,7 @@ public class RecordTimbratura {
 	@Override
 	public boolean equals(Object obj) {
 		RecordTimbratura other = (RecordTimbratura)obj;
-		if (this.enabled == other.enabled && this.time.equals(other.time) && this.dir.equals(other.dir) && this.date.equals(other.date)){
+		if (this.enabled == other.enabled && this.time.equals(other.time) && this.dir.equals(other.dir)){
 			return true;
 		}
 		return false;

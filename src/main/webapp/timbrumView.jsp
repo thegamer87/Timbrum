@@ -195,7 +195,7 @@ body {
 										<input type="hidden" name="date" value=<%=date%> />
 										<input type="hidden" name="action" value="update" />
 										<input type="hidden" name="modify" value=<%= "switchAbilitato-"+i %> />
-										<button type="submit" class="btn btn-success">Abilita/Disabilita <span class="glyphicon glyphicon-refresh"></span></button>
+										<button type="submit" class="btn btn-success">Abilita/Disabilita </button>
 									</form>
 								</td>
 								<td>
@@ -203,7 +203,7 @@ body {
 										<input type="hidden" name="date" value=<%=date%> />
 										<input type="hidden" name="action" value="update" />
 										<input type="hidden" name="modify" value=<%= "switchVerso-"+i %> />
-										<button type="submit" class="btn btn-success">Cambia verso <span class="glyphicon glyphicon-refresh"></span></button>
+										<button type="submit" class="btn btn-success">Cambia verso </button>
 									</form>
 								</td>
 							</tr>
@@ -256,7 +256,7 @@ body {
 								
 							if (tempoMancante != null){
 						%>
-						<p class="text-info">
+						<p class="text-info"><span class="glyphicon glyphicon-refresh"></span>
 							Mancano
 							<%=tempoMancante%>
 							per completare le 7h 12m di lavoro

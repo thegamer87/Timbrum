@@ -37,7 +37,7 @@ public class TimbrumManager {
 	}
 
 	public static TimeBean computeWorkingDay(
-			List<RecordTimbratura> pTimbratureList, Date pTime) {
+			List<RecordTimbratura> pTimbratureList, Date pTime, Date requestTime) {
 
 		pTimbratureList = normalizeTimbrature(pTimbratureList);
 
@@ -105,7 +105,7 @@ public class TimbrumManager {
 		}
 
 		TimeBean lBean = new TimeBean(mWorkingDayPeriod, lWorkedTime,
-				lRemainingTime, lPauseTime, pTimbratureList, pTime);
+				lRemainingTime, lPauseTime, pTimbratureList, requestTime);
 		return lBean;
 	}
 

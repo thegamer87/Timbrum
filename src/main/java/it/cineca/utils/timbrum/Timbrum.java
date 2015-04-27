@@ -57,13 +57,19 @@ public class Timbrum {
         List<RecordTimbratura> timbrature = report.getTimbrature(date);
         List<RecordTimbratura> timbratureMerged = new ArrayList<RecordTimbratura>();
         
-        if (timbrature.size() != otherTimbrature.size()){
+        if (timbrature.size() < otherTimbrature.size()){
         	timbratureMerged = timbrature;
         }
         else{
             for (int i=0; i<timbrature.size();++i){
             	RecordTimbratura timbratura = timbrature.get(i);
-            	RecordTimbratura otherTimbratura = otherTimbrature.get(i);
+            	RecordTimbratura otherTimbratura;
+            	try{
+            		otherTimbratura = otherTimbrature.get(i);
+            	} catch (ArrayIndexOutOfBoundsException ex){
+            		otherTimbratura = timbratura;
+            	}
+            	
             	            	
             	if (timbratura.equals(otherTimbratura)){
             		timbratureMerged.add(i, timbratura);
