@@ -1,11 +1,14 @@
 package it.cineca.utils.timbrum.servlet;
 
 import it.cineca.utils.timbrum.Timbrum;
-import it.cineca.utils.timbrum.request.RecordTimbratura;
+import it.cineca.utils.timbrum.TimbrumManager;
+import it.cineca.utils.timbrum.TimeBean;
 import it.cineca.utils.timbrum.request.LoginRequest.LoginResult;
+import it.cineca.utils.timbrum.request.RecordTimbratura;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -14,8 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
@@ -44,6 +45,7 @@ public class TimbrumServlet extends HttpServlet{
 											appendHours().appendSuffix("h").
 											appendSeparator(" ").
 											appendMinutes().appendSuffix("m").toFormatter();
+
 		DateTime nowDate = new DateTime();
 		String dateString = ggmmyyyyDTF.print(nowDate);
 		try {
@@ -83,91 +85,10 @@ public class TimbrumServlet extends HttpServlet{
 					date = nowDate;
 				}
 
-				ArrayList<String> timbratureString = new ArrayList<String>();
-				ArrayList<RecordTimbratura> timbrature = timbrum.getReport(date.toDate());
-				Period workedTime = Period.ZERO;
-				Period exitTime = Period.ZERO;;
-				Period totalDayWorkTime = Period.hours(7).withMinutes(12);
-				Period remainingTime = Period.ZERO;
-				DateTime outTimeDate;
-				
-				if (timbrature.size() > 0){
-					RecordTimbratura timbratura = null;
-					for (int i=0; i < timbrature.size(); i++){
-						timbratura = timbrature.get(i);
-						//Costruzione stringa timbratura
-						String direzione;
-						if (timbratura.getDirection().equals("E")){
-							direzione = "Entrata";
-						}
-						else if (timbratura.getDirection().equals("U")){
-							direzione = "Uscita";
-						}
-						else{
-							direzione = "N/D";
-						}
-						String t = direzione+" alle "+timbratura.getTime();
-						timbratureString.add(t);
-						//Calcolo tempo lavorato
-						DateTime timbraturaDate = hhmmDTF.parseDateTime(timbratura.getTime());
-						if (i>0){
-							RecordTimbratura precTimbratura = timbrature.get(i-1);
-							//Tempo lavoro
-							if (precTimbratura.getDirection().equals("E") && timbratura.getDirection().equals("U")){
-								DateTime precTimbraturaDate = hhmmDTF.parseDateTime(precTimbratura.getTime());
-								Period periodBeetwenTimbr = new Period(precTimbraturaDate, timbraturaDate);
-								workedTime = workedTime.plus(periodBeetwenTimbr);					
-							}
-							//Tempo uscita
-							if (precTimbratura.getDirection().equals("U") && timbratura.getDirection().equals("E")){
-								DateTime precTimbraturaDate = hhmmDTF.parseDateTime(precTimbratura.getTime());
-								Period periodBeetwenTimbr = new Period(precTimbraturaDate, timbraturaDate);
-								exitTime = exitTime.plus(periodBeetwenTimbr);								
-							}
-						}
-						if (i == timbrature.size() - 1){
-							if (timbratura.getDirection().equals("E")){
-								Period periodFromTimbrToNow = new Period(timbraturaDate, nowDate);
-								workedTime = workedTime.plus(periodFromTimbrToNow);	
-							}
-							if (timbratura.getDirection().equals("U")){
-								Period periodFromTimbrToNow = new Period(timbraturaDate, nowDate);
-								exitTime = exitTime.plus(periodFromTimbrToNow);
-							}
-						}
-					}
-					
-					if (exitTime.getYears() == 0 && exitTime.getMonths() == 0 && 
-							exitTime.getWeeks() == 0 && exitTime.getDays() == 0 && exitTime.getHours() == 0 && 
-							exitTime.getMinutes() < 30){
-						remainingTime = remainingTime.plus(Period.minutes(30));
-					}
-				}
+				List<RecordTimbratura> timbrature = timbrum.getReport(date.toDate());
 		
-				//Calcolo ora di uscita e tempo mancante
-				Period remainingTimePartial = totalDayWorkTime.minus(workedTime);
-				System.out.println("totalDayWorkTime = "+periodFormatter.print(totalDayWorkTime));
-				System.out.println("workedTime = "+periodFormatter.print(workedTime));
-				System.out.println("remainingTimePartial = "+periodFormatter.print(remainingTimePartial));
-				remainingTime = remainingTime.plus(remainingTimePartial);
-				System.out.println("final remainingTime = "+periodFormatter.print(remainingTime));
-				System.out.println("final remainingTimeNormalized = "+periodFormatter.print(remainingTime.normalizedStandard()));				
-				outTimeDate = nowDate.plus(remainingTime);
-				if (date.getYear() == nowDate.getYear() && date.getDayOfYear() == nowDate.getDayOfYear()){
-					//req.setAttribute("tempoMancante",periodFormatter.print(remainingTime.toPeriod().normalizedStandard()));
-					req.setAttribute("oraUscita",hhmmDTF.print(outTimeDate));
-					if (workedTime.getHours() > totalDayWorkTime.getHours() || 
-						(workedTime.getHours() == totalDayWorkTime.getHours() && workedTime.getMinutes() >= totalDayWorkTime.getMinutes())){
-						
-						req.setAttribute("dayFinished", "true");
-					}
-					else{
-						req.setAttribute("dayFinished", "false");
-					}
-				}
-
-				req.setAttribute("timbrature", timbratureString);
-				req.setAttribute("tempoLavorato", periodFormatter.print(workedTime.toPeriod().normalizedStandard()));
+				TimeBean timeBean = TimbrumManager.computeWorkingDay( timbrature , new Date() );
+				req.setAttribute("timeBean", timeBean);
 				
 				req.setAttribute("action","result");
 				req.setAttribute("date", dateString);
@@ -187,6 +108,7 @@ public class TimbrumServlet extends HttpServlet{
 
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			req.setAttribute("message", "Errore nel recupero delle timbrature: "+e.getMessage());
 			req.setAttribute("action","result");
 			req.setAttribute("date", dateString);
