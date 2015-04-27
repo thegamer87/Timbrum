@@ -50,6 +50,10 @@ public class TimbrumServlet extends HttpServlet{
 		String dateString = ggmmyyyyDTF.print(nowDate);
 		try {
 			String action = req.getParameter("action");
+			String modify = req.getParameter("modify");
+			if (modify == null){
+				modify = "";
+			}
 			if (action == null || action.equals("login") || action.equals("update")){
 				Timbrum timbrum = (Timbrum)req.getSession().getAttribute("timbrum");
 				if (timbrum == null){
@@ -85,13 +89,44 @@ public class TimbrumServlet extends HttpServlet{
 					date = nowDate;
 				}
 
-				List<RecordTimbratura> timbrature = timbrum.getReport(date.toDate());
-		
-				TimeBean timeBean = TimbrumManager.computeWorkingDay( timbrature , new Date() );
+				
+				List<RecordTimbratura> timbratureFromSession = null;
+				
+				String precDate = (String)req.getSession().getAttribute("date");
+				if (precDate == null){
+					precDate = "";
+				}
+				TimeBean timeBean = (TimeBean)req.getSession().getAttribute("timeBean");
+				if (timeBean != null){
+					timbratureFromSession = timeBean.getTimbratureList();
+				}
+				
+
+				
+				List<RecordTimbratura> timbrature;
+				if (timbratureFromSession == null || !precDate.equals(dateString)){
+					timbrature = timbrum.getReport(date.toDate());
+				} else{
+					timbrature = timbrum.getReportAndUpdateFromSession(date.toDate(), timbratureFromSession);
+				}
+				if (modify.contains("switchAbilitato-") || modify.contains("switchVerso-")){
+					int toSwitchIndex = Integer.valueOf(modify.split("-")[1]);
+					if (modify.contains("switchAbilitato-")){
+						timbrature.get(toSwitchIndex).switchEnabled();
+					}
+					else{
+						timbrature.get(toSwitchIndex).switchDirection();
+					}
+					
+				}
+				
+				timeBean = TimbrumManager.computeWorkingDay( timbrature , new Date() );
 				req.setAttribute("timeBean", timeBean);
+				req.getSession().setAttribute("timeBean", timeBean);
 				
 				req.setAttribute("action","result");
 				req.setAttribute("date", dateString);
+				req.getSession().setAttribute("date", dateString);
 				RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/timbrumView.jsp");
 	            dispatcher.forward(req, resp);
 			}

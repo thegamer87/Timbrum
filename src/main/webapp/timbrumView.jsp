@@ -1,3 +1,4 @@
+<%@page import="it.cineca.utils.timbrum.request.TimbraturaRequest"%>
 <%@page import="it.cineca.utils.timbrum.TimeBean"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -180,14 +181,31 @@ body {
 							 <!-- http://stackoverflow.com/questions/12937470/twitter-bootstrap-center-text-on-progress-bar -->
 							
 						</div>
-		
 						<table id="timbrature-table" class="table table-striped table-bordered table-hover">
 							<%
-								for(RecordTimbratura timbratura : timbrature){
+								for(int i=0; i<timbrature.size(); ++i){
+									RecordTimbratura timbratura = timbrature.get(i);
 							%>
 							<tr>
-								<td><span class="glyphicon glyphicon-triangle-<%= ("E".equals(timbratura.getDirection()) ? "right" : "left") %>"></span> <%=timbratura.getDirection()%></td>
-								<td><%=timbratura.getTime()%></td>
+								<td><span class="glyphicon glyphicon-triangle-<%= (TimbraturaRequest.VERSO_ENTRATA.equals(timbratura.getDirection()) ? "right" : "left") %>"></span> <%=timbratura.getDirection()%></td>
+								<td><%=timbratura.isEnabled() ? timbratura.getTime() : "<del>"+timbratura.getTime()+"</del>"%></td>
+								<td>
+									<form form id="form-modifica-timbrature" class="form-inline" action="Timbrum"
+											method="POST">
+										<input type="hidden" name="date" value=<%=date%> />
+										<input type="hidden" name="action" value="update" />
+										<input type="hidden" name="modify" value=<%= "switchAbilitato-"+i %> />
+										<button type="submit" class="btn btn-success">Abilita/Disabilita <span class="glyphicon glyphicon-refresh"></span></button>
+									</form>
+								</td>
+								<td>
+									<form action="Timbrum">
+										<input type="hidden" name="date" value=<%=date%> />
+										<input type="hidden" name="action" value="update" />
+										<input type="hidden" name="modify" value=<%= "switchVerso-"+i %> />
+										<button type="submit" class="btn btn-success">Cambia verso <span class="glyphicon glyphicon-refresh"></span></button>
+									</form>
+								</td>
 							</tr>
 							<%
 								}

@@ -70,7 +70,7 @@ public class ReportRequest extends AbstractRequest {
 
         ArrayList<RecordTimbratura> timbrature=new ArrayList<RecordTimbratura>();
         for(int i=0;i<records.size();i++){
-        	RecordTimbratura r=new RecordTimbratura(records.get(i),headers);
+        	RecordTimbratura r=new RecordTimbratura(records.get(i),headers, date);
         	timbrature.add(r);
         }
         return timbrature;

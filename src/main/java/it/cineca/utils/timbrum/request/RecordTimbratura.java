@@ -10,11 +10,14 @@ import java.util.Date;
 public class RecordTimbratura {
 	private String time;
 	private String dir;
-	public RecordTimbratura(String[] strings,String[] headers) {
+	private Date date;
+	private boolean enabled = true;
+	public RecordTimbratura(String[] strings,String[] headers, Date pDate) {
 		int timeIndex =getIndexFor(headers,"TIMETIMBR");
 		int dirIndex =getIndexFor(headers,"DIRTIMBR");
 		time= strings[timeIndex];
 		dir= strings[dirIndex];
+		date = pDate;
 	}
 	
 	//DAYSTAMP, TIMETIMBR, DIRTIMBR, CAUSETIMBR, TYPETIMBR, IPTIMBR
@@ -34,13 +37,39 @@ public class RecordTimbratura {
 		return -1;
 	}
 	
+	public Date getDate(){
+		return date;
+	}
+	
 	public String getTime() {
 		return time;
+	}
+	
+	public void switchEnabled(){
+		if (isEnabled()){
+			enabled = false;
+		} else {
+			enabled = true;
+		}
+	}
+	
+	
+	public boolean isEnabled(){
+		return enabled;
 	}
 	
 	public String getDirection() {
 		return dir;
 	}
+	
+	public void switchDirection(){
+		if (this.dir.equals(TimbraturaRequest.VERSO_ENTRATA)){
+			this.dir = TimbraturaRequest.VERSO_USCITA;
+		} else if (this.dir.equals(TimbraturaRequest.VERSO_USCITA)){
+			this.dir = TimbraturaRequest.VERSO_ENTRATA;
+		} else{}
+	}
+	
 	
 	public boolean isEntry(){
 		return dir.equals(TimbraturaRequest.VERSO_ENTRATA);
@@ -61,5 +90,14 @@ public class RecordTimbratura {
 		c.set(Calendar.MINUTE,Integer.parseInt(minutes));
 		c.set(Calendar.SECOND,0);
 		return c.getTime();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		RecordTimbratura other = (RecordTimbratura)obj;
+		if (this.enabled == other.enabled && this.time.equals(other.time) && this.dir.equals(other.dir) && this.date.equals(other.date)){
+			return true;
+		}
+		return false;
 	}
 }

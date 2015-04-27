@@ -9,6 +9,7 @@ import it.cineca.utils.timbrum.request.TimbraturaRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.http.client.protocol.ClientContext;
@@ -43,11 +44,36 @@ public class Timbrum {
         context.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
     }
 
-    public ArrayList<RecordTimbratura> getReport(Date date) throws Exception {
+    public List<RecordTimbratura> getReport(Date date) throws Exception {
         ReportRequest report = new ReportRequest( new DefaultHttpClient(),context);
         report.setUrl(host+SQL_DATA_PROVIDER_URL);
         //return report.getTimbrature(new Date());
         return report.getTimbrature(date);
+    }
+    
+    public List<RecordTimbratura> getReportAndUpdateFromSession(Date date, List<RecordTimbratura> otherTimbrature)  throws Exception {
+        ReportRequest report = new ReportRequest( new DefaultHttpClient(),context);
+        report.setUrl(host+SQL_DATA_PROVIDER_URL);
+        List<RecordTimbratura> timbrature = report.getTimbrature(date);
+        List<RecordTimbratura> timbratureMerged = new ArrayList<RecordTimbratura>();
+        
+        if (timbrature.size() != otherTimbrature.size()){
+        	timbratureMerged = timbrature;
+        }
+        else{
+            for (int i=0; i<timbrature.size();++i){
+            	RecordTimbratura timbratura = timbrature.get(i);
+            	RecordTimbratura otherTimbratura = otherTimbrature.get(i);
+            	            	
+            	if (timbratura.equals(otherTimbratura)){
+            		timbratureMerged.add(i, timbratura);
+            	}
+            	else{
+            		timbratureMerged.add(i, otherTimbratura);
+            	}
+            }        	
+        }
+        return timbratureMerged;
     }
 
     public LoginResult login() throws IOException {

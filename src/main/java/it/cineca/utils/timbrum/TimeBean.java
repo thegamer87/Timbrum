@@ -22,14 +22,16 @@ public class TimeBean {
 	private Long mPauseTime;
 	private Period mWorkingDayPeriod;
 	private List<RecordTimbratura> mTimbratureList;
+	private Date mTimbratureDate;
 	
 	
-	public TimeBean( Period pWorkingDayPeriod, Long pWorkedTime, Long pRemainingTime, Long pPauseTime, List<RecordTimbratura> pTimbratureList ) {
+	public TimeBean( Period pWorkingDayPeriod, Long pWorkedTime, Long pRemainingTime, Long pPauseTime, List<RecordTimbratura> pTimbratureList, Date pTimbratureDate ) {
 		this.mWorkedTime = pWorkedTime;
 		this.mPauseTime = pPauseTime;
 		this.mRemainingTime = pRemainingTime;
 		this.mWorkingDayPeriod = pWorkingDayPeriod;
 		this.mTimbratureList = pTimbratureList;
+		this.mTimbratureDate = pTimbratureDate;
 	
 	}
 	
@@ -114,6 +116,14 @@ public class TimeBean {
 		c.set(Calendar.HOUR_OF_DAY, 0);
 		Date lToday = c.getTime();
 		return lToday;
+	}
+	
+	private Date getTimbratureDate(){
+		return mTimbratureDate;
+	}
+	
+	private void setTimbratureDate(Date pTimbratureDate){
+		mTimbratureDate = pTimbratureDate;
 	}
 	
 }
