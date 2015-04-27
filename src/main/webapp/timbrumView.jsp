@@ -94,6 +94,7 @@ body {
 			SimpleDateFormat ggmmyyyySDF = new SimpleDateFormat("dd/MM/yyyy");
 			String message = (String)request.getAttribute("message");
 			String debug = (String)request.getAttribute("debug");
+			String modifyMode = (String)request.getSession().getAttribute("modifyMode");
 			List<RecordTimbratura> timbrature = ( tb != null ? tb.getTimbratureList() : null ); 
 			String tempoLavorato = null;
 			String tempoMancante = null;
@@ -154,12 +155,20 @@ body {
 							<div class="form-group">
 								<label for="exampleInputName2">Data timbrature</label> <input
 									id="data-timbrature" type="text" class="form-control" name="date"
-									value="<%=date%>" /> <input type="hidden" name="action"
-									value="update" />
+									value="<%=date%>" /> 
+									<input type="hidden" name="action" value="update" />
 		
 							</div>
 							<button type="submit" class="btn btn-success">Aggiorna <span class="glyphicon glyphicon-refresh"></span></button>
 		
+						</form>
+						<br />
+						<form form id="form-modifica-timbrature" class="form-inline" action="Timbrum"
+							method="POST">
+							<input type="hidden" name="date" value=<%=date%> />
+							<input type="hidden" name="action" value="update" />
+							<input type="hidden" name="modify" value="switchModifyMode" />
+							<button type="submit" class="btn btn-success">Abilita/Disabilita modalita' modifica </button>
 						</form>
 					</div>
 				</div>
@@ -189,6 +198,10 @@ body {
 							<tr>
 								<td><span class="glyphicon glyphicon-triangle-<%= (TimbraturaRequest.VERSO_ENTRATA.equals(timbratura.getDirection()) ? "right" : "left") %>"></span> <%=timbratura.getDirection()%></td>
 								<td><%=timbratura.isEnabled() ? timbratura.getTime() : "<del>"+timbratura.getTime()+"</del>"%></td>
+								<% 
+									if (modifyMode != null && modifyMode.equals("true")){
+										
+								%>
 								<td>
 									<form form id="form-modifica-timbrature" class="form-inline" action="Timbrum"
 											method="POST">
@@ -206,6 +219,9 @@ body {
 										<button type="submit" class="btn btn-success">Cambia verso </button>
 									</form>
 								</td>
+								<%
+									}
+								%>
 							</tr>
 							<%
 								}

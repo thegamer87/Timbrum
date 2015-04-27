@@ -54,7 +54,18 @@ public class TimbrumServlet extends HttpServlet{
 			if (modify == null){
 				modify = "";
 			}
+			
 			if (action == null || action.equals("login") || action.equals("update")){
+				if (modify.equals("switchModifyMode")){
+					String modifyMode = (String)req.getSession().getAttribute("modifyMode");
+					if (modifyMode == null || modifyMode.equals("true")){
+						modifyMode = "false";
+						
+					} else{
+						modifyMode = "true";
+					}
+					req.getSession().setAttribute("modifyMode", modifyMode);
+				}
 				Timbrum timbrum = (Timbrum)req.getSession().getAttribute("timbrum");
 				if (timbrum == null){
 					String username = req.getParameter("username");
